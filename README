@@ -1,0 +1,9 @@
+Five small programs that encrypt and decrypt information using a one-time pad-like system.
+
+keygen.c:  generates a key of specified size
+otp_dec_d.c:   decoding server
+otp_dec.c: decoding client
+otp_enc_d.c:   encoding server
+otp_enc.c:  encoding client
+
+To compile all components, enter:   compileall
