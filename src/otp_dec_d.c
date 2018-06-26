@@ -3,7 +3,7 @@
 *  Author: Deirdre Moran
 *  Program: otp_enc_d.c
 *  Date: 3/17/2018
-*  Description: Server end decryption.  Sends decoded message back to client.
+*  Description: Server-end decryption.  Sends decoded message back to client.
 ******************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,7 +30,7 @@
 *  Parameters:   	socket descriptor
 *  Pre-conditions:	socket is connected
 *  Post-conditions:	None
-*  Return:			size of file
+*  Return:		size of file
 *********************************************************************************/
 int getSize(int socketFD2)
 {
@@ -54,7 +54,7 @@ int getSize(int socketFD2)
 *  Parameters:   	socket descriptor
 *  Pre-conditions:	socket is connected
 *  Post-conditions:	None
-*  Return:			None
+*  Return:		None
 *********************************************************************************/
 void verifyID(int socketFD2){
 	char id[] = "OTP_DEC";
@@ -77,42 +77,41 @@ void verifyID(int socketFD2){
 *  Parameters:   	ciphertext and key buffer, size of message, socket descriptor
 *  Pre-conditions:	socket is connected, buffers and size defined
 *  Post-conditions:	None
-*  Return:			None
+*  Return:		None
 *********************************************************************************/
-void decode(char * buffer, char * buffer2, int size, int socketFD2){
-    char decodedBuffer[MAX_BUFFER];
+void decode(char * buffer, char * buffer2, int size, int socketFD2)
+{
+    	char decodedBuffer[MAX_BUFFER];
 	memset(decodedBuffer, '\0', sizeof(decodedBuffer));
-	// For each character in file data buffer
+	// For each character in file data-buffer
 	int i = 0;
 	for(i = 0; i < size; i++){
-	// Turn space into at symbol for both file and key buffers
-		if (buffer[i] == ' ')
-	 	{
+		// Turn space into at symbol for both file and key buffers
+		if (buffer[i] == ' '){
 			buffer[i] = '@';
 		}
-		if (buffer2[i] == ' ')
-		{
+		if (buffer2[i] == ' '){
 			buffer2[i] = '@';
 		}
-		// Change the chars to integers
-	    int ciphertext = (int) buffer[i];
+		// Change chars to integers
+	    	int ciphertext = (int) buffer[i];
 		int myKey = (int) buffer2[i];
-	          // Subtract 64 for ASCII
-	    ciphertext = ciphertext - 64;
-	    myKey = myKey - 64;
-	    int modCrypt = ciphertext - myKey;
-	    if(modCrypt < 0){
+	        // Subtract 64 for ASCII conversion
+	    	ciphertext = ciphertext - 64;
+	    	myKey = myKey - 64;
+	    	int modCrypt = ciphertext - myKey;
+	    	if(modCrypt < 0){
 			modCrypt = modCrypt + 27;
 		}
 		modCrypt = modCrypt + 64;
-	             // Change integers to chars again
-	    decodedBuffer[i] = (char) modCrypt + 0;
-	             // Turn at symbols to spaces again
-	    if (decodedBuffer[i] == '@')
-	    {
-	        decodedBuffer[i] = ' ';
-	    }
+	        // Change integers to chars again
+	    	decodedBuffer[i] = (char) modCrypt + 0;
+	        // Turn at symbols to spaces again
+	    	if (decodedBuffer[i] == '@'){
+	       		decodedBuffer[i] = ' ';
+	    	}
 	}
+	
 	// Send the decoded message back to the client
 	int k = size;
 	// void pointer to decoded buffer
@@ -141,12 +140,12 @@ void decode(char * buffer, char * buffer2, int size, int socketFD2){
 *************************************************************************************/
 int main(int argc, char *argv[])
 {
-    // variables for sockets, port number, pid, and buffers
-    int sockFD, sockFD2;
+    	// variables for sockets, port number, pid, and buffers
+    	int sockFD, sockFD2;
 	int sPortNum;
-    pid_t pid;
+	pid_t pid;
 	// change the port number argument to integer
-    sPortNum = atoi(argv[1]);
+    	sPortNum = atoi(argv[1]);
 	// Buffers for ciphertext and key files
 	char buffer[MAX_BUFFER];
 	char buffer2[MAX_BUFFER];
@@ -154,46 +153,46 @@ int main(int argc, char *argv[])
    	// Set up the socket
    	sockFD = socket(AF_INET, SOCK_STREAM, 0);
    	if(sockFD < 0){
-        fprintf(stderr, "ERROR: Socket error");
-        exit(1);
-    }
+        	fprintf(stderr, "ERROR: Socket error");
+        	exit(1);
+    	}
         // socket address struct
-    struct sockaddr_in sock;
-    sock.sin_family = AF_INET;
-    sock.sin_port = htons(sPortNum);
-    sock.sin_addr.s_addr = INADDR_ANY;
+    	struct sockaddr_in sock;
+    	sock.sin_family = AF_INET;
+    	sock.sin_port = htons(sPortNum);
+    	sock.sin_addr.s_addr = INADDR_ANY;
 
-    // bind the socket to the client address
-    if(bind(sockFD, (struct sockaddr *) &sock, sizeof(sock)) < 0){
-        fprintf(stderr, "ERROR: Socket binding");
-        exit(1);
-    }
+    	// bind the socket to the client address
+    	if(bind(sockFD, (struct sockaddr *) &sock, sizeof(sock)) < 0){
+        	fprintf(stderr, "ERROR: Socket binding");
+        	exit(1);
+    	}
 
-    // listen for up to 10 connections
-    if(listen(sockFD, MAX_CONNECTIONS) < 0){
-        fprintf(stderr, "ERROR: Socket listening");
-    }
+    	// listen for up to 10 connections
+    	if(listen(sockFD, MAX_CONNECTIONS) < 0){
+    	    fprintf(stderr, "ERROR: Socket listening");
+    	}
 
-    // Loop for server
-    while(1) {
+    	// Loop for server
+    	while(1) {
 		// Close socket if open
 		close(sockFD2);
 		// accept any incoming connections
-        sockFD2 = accept(sockFD, NULL, NULL);
-        if(sockFD2 < 0) {
-            fprintf(stderr, "ERROR: Socket Accept\n");
-       		exit(1);
-       }
+        	sockFD2 = accept(sockFD, NULL, NULL);
+        	if(sockFD2 < 0) {
+            		fprintf(stderr, "ERROR: Socket Accept\n");
+       			exit(1);
+       		}
 
-        // fork a new process
-        pid = fork();
-        // If there was an error forking
-        if (pid < 0) {
-            fprintf(stderr, "ERROR: Forking\n");
-       		exit(1);
-       }
+        	// fork a new process
+        	pid = fork();
+        	// If there was an error forking
+        	if (pid < 0) {
+        		fprintf(stderr, "ERROR: Forking\n");
+       			exit(1);
+       		}
 		// If it is the child process
-        if (pid == 0){
+        	if (pid == 0){
 			// verify ID
 			verifyID(sockFD2);
 			// get sizes of files
@@ -227,11 +226,13 @@ int main(int argc, char *argv[])
 			// decode message and send to client
 			decode(buffer, buffer2, fileSize, sockFD2);
 		}
+		
 		// If parent process, close socket
 		if(pid > 0){
 			close(sockFD2);
 		}	// end of fork
 	}  // end of server loop
+	
 	// close server socket
 	close(sockFD);
 }
