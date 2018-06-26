@@ -3,7 +3,7 @@
 *  Program: otp_enc.c
 *  Date: 3/17/2018
 *  Description: One-time-tab client side, sends key and plaintext files
-*				for server side encoding
+*		for server side encoding
 ************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,12 +23,12 @@
 
 /***********************************************************************
 *  Function: 		sendEnc()
-*  Description:  	Checks buffer for bad characters.  If none
-*					present, sends data to server
+*  Description:  	Checks buffer for bad characters.  
+*			If none, sends data to server
 *  Parameters:   	file and socket descriptors
 *  Pre-conditions:	file is open, socket is connected
 *  Post-conditions:	file is closed
-*  Return:			None
+*  Return:		None
 ************************************************************************/
 void sendEnc(int fileD[2], int sockFD){
 	int i, j, count = 0;
@@ -83,7 +83,7 @@ void sendEnc(int fileD[2], int sockFD){
 *  Parameters:   	socket descriptor and size of message
 *  Pre-conditions:	socket is connected
 *  Post-conditions:	None
-*  Return:			None
+*  Return:		None
 ************************************************************************/
 void recvEncMsg(int sockFD, int fSize){
 	int i;
@@ -115,11 +115,11 @@ void recvEncMsg(int sockFD, int fSize){
 /***********************************************************************
 *  Function: 		verifyID()
 *  Description:  	Sends id (filename) to server, verifies self as
-*					otp_enc (server should only accept otp_enc)
+*			otp_enc (server should only accept otp_enc)
 *  Parameters:   	socket descriptor
 *  Pre-conditions:	socket is connected
 *  Post-conditions:	None
-*  Return:			None
+*  Return:		None
 ************************************************************************/
 void verifyID(int sockFD){
 	char idStr[20];
@@ -151,7 +151,7 @@ void verifyID(int sockFD){
 *  Parameters:   	file and socket descriptors
 *  Pre-conditions:	socket is connected
 *  Post-conditions:	None
-*  Return:			size of file
+*  Return:		size of file
 ************************************************************************/
 int sendSizes(char * file, int sockFD){
 	char sizeStr[20];
@@ -191,7 +191,7 @@ int sendSizes(char * file, int sockFD){
 **************************************************************************************
 *  Function: 		MAIN
 *  Description:  	Sends plaintext and key files to encoding server,
-*					receives encoded message
+*			receives encoded message
 *  Arguments:   	otp_enc [plaintext filename] [key filename] [server portnumber]
 *  Pre-conditions:	otp_enc_c is running on server portnumber
 **************************************************************************************
@@ -277,12 +277,12 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	// Send the contents of file to encoding server
+	// Send the contents of key-file to encoding server
 	else{
 		// Send the contents of file to encoding server
 		sendEnc(fd, socketFD);
 	}
-		// close the file
+	// close the key-file
 	close(fd[1]);
 
 	// Receive and print encoded message
