@@ -24,11 +24,11 @@
 /***********************************************************************
 *  Function: 		sendDec()
 *  Description:  	Checks buffer for bad characters.  If none
-*					present, sends data to server
+*			sends data to server
 *  Parameters:   	file and socket descriptors
 *  Pre-conditions:	file is open, socket is connected
 *  Post-conditions:	file is closed
-*  Return:			None
+*  Return:		None
 ************************************************************************/
 void sendDec(int fileD[2], int sockFD){
 	int i, j, count = 0;
@@ -83,7 +83,7 @@ void sendDec(int fileD[2], int sockFD){
 *  Parameters:   	socket descriptor and size of message
 *  Pre-conditions:	socket is connected
 *  Post-conditions:	None
-*  Return:			None
+*  Return:		None
 ************************************************************************/
 void recvDecMsg(int sockFD, int fSize){
 	int i;
@@ -115,11 +115,11 @@ void recvDecMsg(int sockFD, int fSize){
 /***********************************************************************
 *  Function: 		verifyID()
 *  Description:  	Sends id (filename) to server, verifies self as
-*					otp_dec (decoding server should only accept otp_dec)
+*			otp_dec (decoding server should only accept otp_dec)
 *  Parameters:   	socket descriptor
 *  Pre-conditions:	socket is connected
 *  Post-conditions:	None
-*  Return:			None
+*  Return:		None
 ************************************************************************/
 void verifyID(int sockFD){
 	char idStr[20];
@@ -151,7 +151,7 @@ void verifyID(int sockFD){
 *  Parameters:   	file and socket descriptors
 *  Pre-conditions:	socket is connected
 *  Post-conditions:	None
-*  Return:			size of file
+*  Return:		size of file
 ************************************************************************/
 int sendSizes(char * file, int sockFD){
 	char sizeStr[20];
@@ -191,7 +191,7 @@ int sendSizes(char * file, int sockFD){
 **************************************************************************************
 *  Function: 		MAIN
 *  Description:  	Sends plaintext and key files to decoding server,
-*					receives decoded message
+*			receives decoded message
 *  Arguments:   	otp_dec [plaintext filename] [key filename] [server portnumber]
 *  Pre-conditions:	otp_dec_c is running on server portnumber
 **************************************************************************************
@@ -228,11 +228,11 @@ int main(int argc, char *argv[])
 	}
 	// Copy in the address
 	memcpy((char*)&serverAddress.sin_addr.s_addr, (char*)serverHostInfo->h_addr, serverHostInfo->h_length);
-	// Set up the socket
+	// Set up the socket and check for errors
 	socketFD = socket(AF_INET, SOCK_STREAM, 0);
-		if (socketFD < 0) {
-			fprintf(stderr, "ERROR: Cannot open socket");
-			exit(1);
+	if (socketFD < 0) {
+		fprintf(stderr, "ERROR: Cannot open socket");
+		exit(1);
 	}
 
 	// Connect to server
@@ -245,14 +245,13 @@ int main(int argc, char *argv[])
 
 	// open plaintext file specified in command line argument
 	fd[1] = open(argv[1], O_RDONLY, 0664);
-	// If error opening file
 	if(fd[1] == -1){
 		fflush(stdout);
 		fprintf(stderr, "ERROR: Cannot open file");
 		exit(1);
 	}
 
-	// Else file is open
+	// Send contents of file to server
 	else{
 		// Get the size of plaintext and key files, send to server
 		pTextSize = sendSizes(argv[1], socketFD);
@@ -268,9 +267,8 @@ int main(int argc, char *argv[])
 	// Close the file
 	close(fd[1]);
 
-	// Open key file
+	// Open key file and error report
 	fd[1] = open(argv[2], O_RDONLY, 0664);
-	// If error opening file
 	if(fd[1] == -1){
 		fflush(stdout);
 		fprintf(stderr, "ERROR: Cannot open file");
@@ -282,7 +280,7 @@ int main(int argc, char *argv[])
 		// Send the contents of file to decoding server
 		sendDec(fd, socketFD);
 	}
-		// close the file
+	// close the file
 	close(fd[1]);
 
 	// Receive and print decoded message
